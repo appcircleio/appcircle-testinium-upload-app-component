@@ -29,7 +29,7 @@ inputs:
   helpText:
 - key: "AC_TESTINIUM_COMPANY_ID"
   defaultValue: "$AC_TESTINIUM_COMPANY_ID"
-  isRequired: true
+  isRequired: false
   title: Company ID
   description: "Testinium company ID."
   helpText:
