@@ -28,8 +28,8 @@ $time_period = 30
 def get_parsed_response(response)
   JSON.parse(response, symbolize_names: true)
 rescue JSON::ParserError, TypeError => e
-  puts "\nJSON parsing error! Received response: (#{response})".red
-  puts "Error Message: #{e}\n".red
+  puts "\nJSON expected but received: #{response}".red
+  puts "Error Message: #{e}".red
   exit(1)
 end
 
@@ -38,38 +38,37 @@ def check_timeout()
   now = DateTime.now
 
   if now > $end_time
-    puts 'The component is terminating due to a timeout exceeded.
-     If you want to allow more time, please increase the AC_TESTINIUM_TIMEOUT input value.'.red
+    puts "Timeout exceeded! If you want to allow more time, please increase the AC_TESTINIUM_TIMEOUT input value.".red
     exit(1)
   end
 end
 
 def is_count_less_than_max_api_retry(count)
-  count < $each_api_max_retry_count
+  return count < $each_api_max_retry_count
 end
 
 def login()
-  puts "Logging in to Testinium...".blue
+  puts "Logging in to Testinium...".yellow
   uri = URI.parse('https://account.testinium.com/uaa/oauth/token')
   token = 'dGVzdGluaXVtU3VpdGVUcnVzdGVkQ2xpZW50OnRlc3Rpbml1bVN1aXRlU2VjcmV0S2V5'
   count = 1
 
-  while is_count_less_than_max_api_retry(count) do
+  while is_count_less_than_max_api_retry(count)
     check_timeout()
-    puts("Signing in. Attempt: #{count}".yellow)
+    puts "Signing in. Attempt: #{count}".blue
 
     req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json', 'Authorization' => "Basic #{token}" })
     req.set_form_data({ 'grant_type' => 'password', 'username' => $username, 'password' => $password })
     res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
 
     if res.is_a?(Net::HTTPSuccess)
-      puts('Successfully logged in...'.green)
+      puts "Successfully logged in...".green
       return get_parsed_response(res.body)[:access_token]
     elsif res.is_a?(Net::HTTPUnauthorized)
-      puts(get_parsed_response(res.body)[:error_description].red)
+      puts get_parsed_response(res.body)[:error_description].red
       count += 1
     else
-      puts("Login error! Server response: #{get_parsed_response(res.body)}".red)
+      puts "Login error: #{get_parsed_response(res.body)}".red
       count += 1
     end
   end
@@ -78,24 +77,24 @@ end
 
 def find_project(access_token)
   count = 1
-  puts("Searching for project...".blue)
+  puts "Searching for project...".blue
 
   while is_count_less_than_max_api_retry(count) do
     check_timeout()
-    puts("Finding project. Attempt: #{count}".yellow)
+    puts "Finding project. Attempt: #{count}".yellow
 
     uri = URI.parse("https://testinium.io/Testinium.RestApi/api/projects/#{$project_id}")
     req = Net::HTTP::Get.new(uri.request_uri, { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{access_token}", 'current-company-id' => "#{$company_id}" })
     res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
 
     if res.is_a?(Net::HTTPSuccess)
-      puts('Project found successfully!'.green)
+      puts "Project found successfully!".green
       return get_parsed_response(res.body)
     elsif res.is_a?(Net::HTTPClientError)
-      puts(get_parsed_response(res.body)[:message].red)
+      puts get_parsed_response(res.body)[:message].red
       count += 1
     else
-      puts("Project search error! Server response: #{get_parsed_response(res.body)}".red)
+      puts "Project search error! Server response: #{get_parsed_response(res.body)}".red
       count += 1
     end
   end
@@ -107,7 +106,7 @@ def upload(access_token)
 
   while is_count_less_than_max_api_retry(count) do
     check_timeout()
-    puts("Uploading #{$file_name} to Testinium... Attempt: #{count}".yellow)
+    puts "Uploading #{$file_name} to Testinium... Attempt: #{count}".yellow
 
     uri = URI.parse('https://testinium.io/Testinium.RestApi/api/file/upload')
     req = Net::HTTP::Post.new(uri.request_uri, { 'Accept' => '*/*', 'Authorization' => "Bearer #{access_token}", 'current-company-id' => "#{$company_id}" })
@@ -116,13 +115,13 @@ def upload(access_token)
     res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
 
     if res.is_a?(Net::HTTPSuccess)
-      puts('File uploaded successfully!'.green)
+      puts "File uploaded successfully!".green
       return get_parsed_response(res.body)
     elsif res.is_a?(Net::HTTPClientError)
-      puts(get_parsed_response(res.body)[:message].red)
+      puts get_parsed_response(res.body)[:message].red
       count += 1
     else
-      puts("File upload error! Server response: #{get_parsed_response(res.body)}".red)
+      puts "File upload error! Server response: #{get_parsed_response(res.body)}".red
       count += 1
     end
   end
@@ -135,7 +134,7 @@ def update_project(project, file_response, access_token)
   ios_meta = file_response[:meta_data]
   abort('Upload error: File token missing.'.red) if file_token.nil?
 
-  puts("File uploaded successfully #{file_token}".green)
+  puts "File uploaded successfully #{file_token}".green
 
   dict = {
     'enabled' => true,
@@ -150,6 +149,7 @@ def update_project(project, file_response, access_token)
   when '.ipa'
     puts "iOS app uploading...".blue
     dict[:ios_mobile_app] = $file_name_str
+    dict[:ios_app_hash] = project[:ios_app_hash]
     dict[:ios_file_token] = file_token
     dict[:ios_meta] = ios_meta
   when '.apk'
@@ -162,7 +162,7 @@ def update_project(project, file_response, access_token)
 
   while is_count_less_than_max_api_retry(count) do
     check_timeout()
-    puts("Updating Testinium project... Attempt: #{count}".yellow)
+    puts "Updating Testinium project... Attempt: #{count}".yellow
 
     uri = URI.parse("https://testinium.io/Testinium.RestApi/api/projects/#{project[:id]}")
     req = Net::HTTP::Put.new(uri.request_uri, { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{access_token}", 'current-company-id' => "#{$company_id}" })
@@ -170,13 +170,13 @@ def update_project(project, file_response, access_token)
     res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
 
     if res.is_a?(Net::HTTPSuccess)
-      puts('Project updated successfully!'.green)
+      puts "Project updated successfully!".green
       return get_parsed_response(res.body)
     elsif res.is_a?(Net::HTTPClientError)
-      puts(get_parsed_response(res.body)[:message].red)
+      puts get_parsed_response(res.body)[:message].red
       count += 1
     else
-      puts("Project update error! Server response: #{get_parsed_response(res.body)}".red)
+      puts "Project update error! Server response: #{get_parsed_response(res.body)}".red
       count += 1
     end
   end
