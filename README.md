@@ -11,7 +11,3 @@ The **Testinium Upload App** component enables uploading mobile applications to 
 - `AC_TESTINIUM_COMPANY_ID`: Testinium company ID.
 - `AC_TESTINIUM_TIMEOUT`: Testinium plan timeout in minutes.
 - `AC_TESTINIUM_MAX_API_RETRY_COUNT`: Determine max repetition in case of Testinium platform congestion or API errors.
-
-## Optional Inputs
-
-- `AC_TESTINIUM_COMPANY_ID`: Testinium company ID.
