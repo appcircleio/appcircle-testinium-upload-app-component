@@ -10,7 +10,7 @@ def env_has_key(key)
 end
 
 def get_env_variable(key)
-	return (ENV[key] == nil || ENV[key] == "") ? nil : ENV[key]
+  return (ENV[key] == nil || ENV[key] == "") ? nil : ENV[key]
 end
 
 MINUTES_IN_A_DAY = 1440
