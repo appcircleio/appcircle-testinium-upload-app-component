@@ -11,3 +11,12 @@ The **Testinium Upload App** component enables uploading mobile applications to 
 - `AC_TESTINIUM_COMPANY_ID`: Testinium company ID.
 - `AC_TESTINIUM_TIMEOUT`: Testinium plan timeout in minutes.
 - `AC_TESTINIUM_MAX_API_RETRY_COUNT`: Determine max repetition in case of Testinium platform congestion or API errors.
+
+## Optional Inputs
+
+- `AC_TESTINIUM_ENTERPRISE_BASE_URL`: The base URL for Testinium Enterprise. This is required if you are using Testinium Enterprise. Only for Testinium cloud users, this input is not mandatory.
+
+## Outputs
+
+- `AC_TESTINIUM_UPLOADED_APP_ID`: The unique identifier for the application uploaded to Testinium. This ID is used to select the uploaded application on **Testinium Run Test Plan** step.
+- `AC_TESTINIUM_APP_OS`: The operating system of the uploaded application, either iOS or Android. This helps to run the test plan according to the platform OS in **Testinium Run Test Plan** step.
