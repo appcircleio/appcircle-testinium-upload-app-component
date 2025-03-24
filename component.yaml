@@ -7,7 +7,7 @@ inputs:
   defaultValue: "$AC_TESTINIUM_APP_PATH"
   isRequired: true
   title: Path of the build
-  description: "Full path of the build file. Example for iOS: `$AC_EXPORT_DIR/MyApp.ipa`. Example for Android: `$AC_APK_PATH`."
+  description: "Full path of the build file. Example for iOS: `$AC_OUTPUT_DIR/MyApp.ipa`. Example for Android: `$AC_APK_PATH`."
   helpText:
 - key: "AC_TESTINIUM_USERNAME"
   defaultValue: "$AC_TESTINIUM_USERNAME"
