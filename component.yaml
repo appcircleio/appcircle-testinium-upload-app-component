@@ -25,7 +25,7 @@ inputs:
   defaultValue: "$AC_TESTINIUM_ENTERPRISE_BASE_URL"
   isRequired: false
   title: Testinium Enterprise Base URL
-  description: "The base URL for Testinium enterprise. This is required if you are using Testinium enterprise. Only for Testinium cloud users, this input is not mandatory."
+  description: "The base URL for Testinium enterprise. This input is only required for Testinium enterprise users. Cloud users can ignore it."
   helpText:
 - key: "AC_TESTINIUM_PROJECT_ID"
   defaultValue: "$AC_TESTINIUM_PROJECT_ID"
@@ -48,8 +48,8 @@ inputs:
 - key: "AC_TESTINIUM_MAX_API_RETRY_COUNT"
   defaultValue: "4"
   isRequired: true
-  title: Testinium Maximum API Repetition Count
-  description: "Determine max repetition in case of Testinium platform congestion or API errors."
+  title: Testinium Maximum API Retry Count
+  description: "Determine max retry in case of Testinium platform congestion or API errors."
   helpText:
 outputs:
 - key: "AC_TESTINIUM_UPLOADED_APP_ID"

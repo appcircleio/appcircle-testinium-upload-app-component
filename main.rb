@@ -31,8 +31,6 @@ def get_base_url
   URI.join($ent_base_url || $cloud_base_url, "Testinium.RestApi/api").to_s
 end
 
-$use_ssl = get_base_url.match?(/^https/)
-
 def get_parsed_response(response)
   JSON.parse(response, symbolize_names: true)
 rescue JSON::ParserError, TypeError => e
@@ -57,6 +55,7 @@ def retry_request(max_retries)
 end
 
 def send_request(method, url, headers, body = nil)
+  use_ssl = get_base_url.match?(/^https/)
   uri = URI.parse(url)
   req = case method.upcase
         when 'GET'
@@ -77,7 +76,7 @@ def send_request(method, url, headers, body = nil)
           raise "Unsupported HTTP method: #{method}"
         end
 
-  Net::HTTP.start(uri.hostname, uri.port, use_ssl: $use_ssl) { |http| http.request(req) }
+  Net::HTTP.start(uri.hostname, uri.port, use_ssl: use_ssl) { |http| http.request(req) }
 end
 
 def handle_api_response(res, action, parsed = true)
@@ -137,7 +136,7 @@ def upload(access_token)
     puts "File upload attempt: #{count}".blue
     res = send_request('POST', url, headers, form_data)
     parsed_response = handle_api_response(res, "uploading the application", !$ent_base_url)
-    return parsed_response
+    return parsed_response if parsed_response
   end
 end
 

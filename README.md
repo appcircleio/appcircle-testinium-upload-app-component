@@ -14,7 +14,7 @@ The **Testinium Upload App** component enables uploading mobile applications to 
 
 ## Optional Inputs
 
-- `AC_TESTINIUM_ENTERPRISE_BASE_URL`: The base URL for Testinium Enterprise. This is required if you are using Testinium Enterprise. Only for Testinium cloud users, this input is not mandatory.
+- `AC_TESTINIUM_ENTERPRISE_BASE_URL`: The base URL for Testinium enterprise. This input is only required for Testinium enterprise users. Cloud users can ignore it.
 
 ## Outputs
 
