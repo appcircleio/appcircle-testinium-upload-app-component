@@ -13,6 +13,7 @@ def get_env_variable(key)
   ENV[key].nil? || ENV[key].empty? ? nil : ENV[key]
 end
 
+$SUCCESS_CODE = 200
 MINUTES_IN_A_DAY = 1440
 $file = env_has_key('AC_TESTINIUM_APP_PATH')
 $file_name = File.basename($file).to_s
@@ -83,7 +84,7 @@ def handle_api_response(res, action, parsed = true)
   case res
   when Net::HTTPSuccess
     puts "#{action.capitalize} successful.".green
-    return parsed ? get_parsed_response(res.body) : nil
+    return parsed ? get_parsed_response(res.body) : $SUCCESS_CODE
   when Net::HTTPUnauthorized
     puts "Authorization error while #{action}: #{get_parsed_response(res.body)[:error_description]}".red
   when Net::HTTPClientError
